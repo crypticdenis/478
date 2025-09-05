@@ -35,8 +35,45 @@
   </head>
   <body class="no-scroll">
     <header>
+      <button id="burgerMenu" aria-label="Open menu" class="burger-menu">
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+      </button>
       <h1>Take a Breath</h1>
     </header>
+
+    <!-- Sidebar Menu -->
+    <nav
+      id="sidebarMenu"
+      class="sidebar-menu"
+      aria-label="Main menu"
+      tabindex="-1"
+    >
+      <button id="closeSidebar" class="close-sidebar" aria-label="Close menu">
+        &times;
+      </button>
+      <h2>Background Sounds</h2>
+      <ul class="bg-sound-list">
+        <li><button class="bg-sound-btn" data-sound="none">None</button></li>
+        <li><button class="bg-sound-btn" data-sound="woods">Woods</button></li>
+        <li><button class="bg-sound-btn" data-sound="river">River</button></li>
+        <li>
+          <button class="bg-sound-btn" data-sound="white_noise">
+            White Noise
+          </button>
+        </li>
+      </ul>
+      <h2>How it Works</h2>
+      <div class="instructions">
+        <p>
+          Click the circle to start the 4-7-8 breathing cycle.<br />
+          Inhale (4s), Hold (7s), Exhale (8s).<br />
+          Sound cues and background sounds help you focus.<br />
+          click the circle to stop
+        </p>
+      </div>
+    </nav>
 
     <main>
       <section class="container-section">
