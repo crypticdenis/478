@@ -272,8 +272,8 @@ h1 {
     justify-content: center;
   }
   .breathe-478-circle {
-    width: clamp(70px, 70vw, 140px);
-    height: clamp(70px, 70vw, 140px);
+    width: clamp(300px, 70vw, 140px);
+    height: clamp(300px, 70vw, 140px);
     margin-bottom: 14px;
     touch-action: manipulation;
   }
@@ -282,8 +282,8 @@ h1 {
     opacity: 0.08;
   }
   .breathe-478-text {
-    font-size: 1.1rem;
-    margin-top: 8px;
+    font-size: 2rem;
+    margin-top: 80px;
     padding: 0 0.5rem;
     word-break: break-word;
   }
