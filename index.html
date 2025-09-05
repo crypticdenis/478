@@ -6,12 +6,9 @@
       Simple Online Meditation Timer with Nature Sounds | Meditational
     </title>
     <link rel="preload" href="img/volume-mute.png" as="image" />
-    <link rel="preload" href="img/volume.png" as="image" />
-    <link rel="preload" href="sounds/river.mp3" as="audio" />
-    <link rel="preload" href="sounds/woods.mp3" as="audio" />
-    <link rel="preload" href="sounds/white_noise.mp3" as="audio" />
-    <link rel="preload" href="sounds/gong.mp3" as="audio" />
-    <link rel="preload" href="sounds/untitled.mp3" as="audio" />
+    <!-- <link rel="preload" href="img/volume.png" as="image" /> removed: not used immediately -->
+    <!-- Preload images only, remove unsupported as values for audio -->
+    <!-- Remove audio preloads or use <audio preload="auto"> in HTML -->
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <script src="script.js" defer></script>
 
@@ -33,64 +30,14 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="icon" href="/favicon.ico" />
-    <link rel="manifest" href="/site.webmanifest" />
+    <!-- <link rel="manifest" href="/site.webmanifest" /> Manifest removed: file not found -->
     <link rel="stylesheet" href="style.css" />
   </head>
   <body class="no-scroll">
     <header>
-      <h1>Take a deep Breath</h1>
-      <div class="quote" id="quote">
-        <p>“The mind is everything. What you think you become.”</p>
-      </div>
+      <h1>Take a Breath</h1>
     </header>
 
-    <section id="sound-section">
-      <div id="soundToggle" class="sound-toggle">
-        <img
-          src="img/wave-sound.png"
-          alt="Tiny Image"
-          class="top-right-image"
-          id="soundIcon"
-        />
-        <div style="text-align: center; font-size: 0.75em; margin-top: 4px">
-          Sounds
-        </div>
-      </div>
-      <div class="sound-menu hidden" id="soundMenu">
-        <div class="sound-row">
-          <select
-            class="dropdown-s"
-            name="musicSelect"
-            id="musicSelect"
-            onchange="changeSound()"
-          >
-            <option value="river.mp3">river</option>
-            <option value="woods.mp3">woods</option>
-            <option value="white_noise.mp3">white noise</option>
-          </select>
-          <a href="#" id="musicToggle">
-            <img
-              src="img/volume-mute.png"
-              alt="Tiny Image"
-              class="top-right-image"
-              id="musicOn"
-            />
-          </a>
-        </div>
-        <div class="slidecontainer">
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value="50"
-            class="sound-slider"
-            id="volumeSlider"
-            style="padding: 0"
-            onchange="changeVolume()"
-          />
-        </div>
-      </div>
-    </section>
     <main>
       <section class="container-section">
         <div class="breathe-478-center">
@@ -109,95 +56,12 @@
             <div class="breathe-478-glow"></div>
           </div>
           <div class="breathe-478-text" id="breathe478Text">Click to begin</div>
-          <!-- Audio cues for inhale, hold, exhale -->
-          <audio
-            id="breatheInhaleSound"
-            src="sounds/gong.mp3"
-            preload="auto"
-          ></audio>
-          <audio
-            id="breatheHoldSound"
-            src="sounds/river.mp3"
-            preload="auto"
-          ></audio>
-          <audio
-            id="breatheExhaleSound"
-            src="sounds/woods.mp3"
-            preload="auto"
-          ></audio>
         </div>
       </section>
-      <script>
-        // 4-7-8 Breathing Animation (inhale-hold-exhale)
-        const circle = document.getElementById("breathe478Circle");
-        const text = document.getElementById("breathe478Text");
-        let running = false;
-        let phase = 0;
-        let timeoutId = null;
-        const soundInhale = document.getElementById("breatheInhaleSound");
-        const soundHold = document.getElementById("breatheHoldSound");
-        const soundExhale = document.getElementById("breatheExhaleSound");
-        const phases = [
-          {
-            label: "Inhale",
-            duration: 4000,
-            scale: 1.3,
-            color: "#8D9DDA",
-            shadow: "0 0 80px 20px #8D9DDA88",
-            sound: soundInhale,
-          },
-          {
-            label: "Hold",
-            duration: 7000,
-            scale: 1.3,
-            color: "#C1C9E5",
-            shadow: "0 0 100px 30px #C1C9E588",
-            sound: soundHold,
-          },
-          {
-            label: "Exhale",
-            duration: 8000,
-            scale: 0.7,
-            color: "#283246",
-            shadow: "0 0 60px 0 #28324688",
-            sound: soundExhale,
-          },
-        ];
-        function breatheLoop() {
-          if (!running) return;
-          const p = phases[phase];
-          text.textContent = p.label;
-          circle.style.transition = `transform ${
-            p.duration / 1000
-          }s cubic-bezier(0.4,0,0.2,1), background 1s, box-shadow 1.5s`;
-          circle.style.transform = `scale(${p.scale})`;
-          circle.style.background = p.color;
-          circle.style.boxShadow = p.shadow;
-          if (p.sound) {
-            p.sound.currentTime = 0;
-            p.sound.play();
-          }
-          timeoutId = setTimeout(() => {
-            phase = (phase + 1) % phases.length;
-            breatheLoop();
-          }, p.duration);
-        }
-        circle.addEventListener("click", () => {
-          if (!running) {
-            running = true;
-            phase = 0;
-            breatheLoop();
-          } else {
-            running = false;
-            text.textContent = "Click to begin";
-            circle.style.transform = "scale(1)";
-            circle.style.background = "#8D9DDA";
-            circle.style.boxShadow = "0 0 40px 0 rgba(141,157,218,0.2)";
-            clearTimeout(timeoutId);
-          }
-        });
-      </script>
     </main>
+    <audio id="audioIn" src="sounds/in.mp3" preload="auto"></audio>
+    <audio id="audioOut" src="sounds/out.mp3" preload="auto"></audio>
+    <audio id="audioGong" src="sounds/gong.mp3" preload="auto"></audio>
     <footer></footer>
   </body>
 </html>
