@@ -93,11 +93,16 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
   function playSound(phaseObj) {
     if (phaseObj.sound === "in" && audioIn) {
-      audioIn.currentTime = 0;
-      audioIn.play();
+      // Clone for iOS reliability
+      const clone = audioIn.cloneNode();
+      clone.currentTime = 0;
+      clone.volume = audioIn.volume;
+      clone.play();
     } else if (phaseObj.sound === "out" && audioOut) {
-      audioOut.currentTime = 0;
-      audioOut.play();
+      const clone = audioOut.cloneNode();
+      clone.currentTime = 0;
+      clone.volume = audioOut.volume;
+      clone.play();
     } else if (phaseObj.sound === "gong" && audioGong) {
       audioGong.currentTime = 0;
       audioGong.play();
