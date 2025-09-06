@@ -64,10 +64,52 @@ document.addEventListener("DOMContentLoaded", () => {
   // Breathing logic
   const circle = document.getElementById("breathe478Circle");
   const text = document.getElementById("breathe478Text");
+
+  // Single audio track for the whole cycle
   let cycleAudio = new Audio("sounds/cycle.mp3");
+  cycleAudio.loop = true;
   cycleAudio.volume = 0.6;
+
   let running = false;
-  let cycleAudioTimeout = null;
+  let phase = 0;
+  let timeoutId = null;
+
+  const phases = [
+    {
+      label: "Inhale",
+      duration: 4000,
+      scale: 1.3,
+      color: "#8D9DDA",
+      shadow: "0 0 80px 20px #8D9DDA88",
+    },
+    {
+      label: "Hold",
+      duration: 7000,
+      scale: 1.3,
+      color: "#C1C9E5",
+      shadow: "0 0 100px 30px #C1C9E588",
+    },
+    {
+      label: "Exhale",
+      duration: 8000,
+      scale: 0.7,
+      color: "#283246",
+      shadow: "0 0 60px 0 #28324688",
+    },
+  ];
+
+  function breathePhaseLoop() {
+    if (!running) return;
+
+    const currentPhase = phases[phase];
+    text.textContent = currentPhase.label;
+    circle.style.transform = `scale(${currentPhase.scale})`;
+    circle.style.background = currentPhase.color;
+    circle.style.boxShadow = currentPhase.shadow;
+
+    phase = (phase + 1) % phases.length;
+    timeoutId = setTimeout(breathePhaseLoop, currentPhase.duration);
+  }
 
   // iOS audio unlock workaround
   let audioUnlocked = false;
@@ -90,26 +132,19 @@ document.addEventListener("DOMContentLoaded", () => {
     unlockAllAudio();
     if (!running) {
       running = true;
-      text.textContent = "Breathing...";
-      circle.style.transform = "scale(1.3)";
-      circle.style.background = "#8D9DDA";
-      circle.style.boxShadow = "0 0 80px 20px #8D9DDA88";
-      function playCycleAudioLoop() {
-        if (!running) return;
-        cycleAudio.currentTime = 0;
-        cycleAudio.play().catch(() => {});
-        cycleAudioTimeout = setTimeout(playCycleAudioLoop, 19000);
-      }
-      playCycleAudioLoop();
+      phase = 0;
+      cycleAudio.currentTime = 0;
+      cycleAudio.play().catch(() => {});
+      breathePhaseLoop();
     } else {
       running = false;
+      cycleAudio.pause();
+      cycleAudio.currentTime = 0;
       text.textContent = "Click to begin";
       circle.style.transform = "scale(1)";
       circle.style.background = "#8D9DDA";
       circle.style.boxShadow = "0 0 40px 0 rgba(141,157,218,0.2)";
-      clearTimeout(cycleAudioTimeout);
-      cycleAudio.pause();
-      cycleAudio.currentTime = 0;
+      clearTimeout(timeoutId);
     }
   });
 });
