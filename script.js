@@ -62,9 +62,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const audioIn = document.getElementById("audioIn");
   const audioOut = document.getElementById("audioOut");
   const audioGong = document.getElementById("audioGong");
+
   let running = false;
   let phase = 0;
   let timeoutId = null;
+
   const phases = [
     {
       label: "Inhale",
@@ -92,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
     },
   ];
 
-  // Play sound helper
+  // Play sound helper (reliable DOM element reuse)
   function playSound(phaseObj) {
     let aud = null;
 
@@ -104,9 +106,11 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         aud.pause(); // stop if still playing
         aud.currentTime = 0; // rewind
-        aud.play().catch(() => {});
+        aud.play().catch((err) => {
+          console.warn("Audio play failed:", err);
+        });
       } catch (err) {
-        console.warn("Audio play failed:", err);
+        console.warn("Audio exception:", err);
       }
     }
   }
@@ -134,11 +138,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (audioUnlocked) return;
     [audioIn, audioOut, audioGong].forEach((aud) => {
       if (aud) {
-        aud.volume = 0;
-        aud.play().catch(() => {});
-        aud.pause();
-        aud.currentTime = 0;
-        aud.volume = 1;
+        aud.muted = true;
+        aud
+          .play()
+          .then(() => {
+            aud.pause();
+            aud.currentTime = 0;
+            aud.muted = false;
+          })
+          .catch(() => {});
       }
     });
     audioUnlocked = true;
