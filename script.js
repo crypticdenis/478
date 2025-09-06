@@ -94,21 +94,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Play sound helper
   function playSound(phaseObj) {
-    if (phaseObj.sound === "in" && audioIn) {
-      const snd = new Audio(audioIn.src);
-      snd.volume = audioIn.volume;
-      snd.currentTime = 0;
-      snd.play().catch(() => {});
-    } else if (phaseObj.sound === "out" && audioOut) {
-      const snd = new Audio(audioOut.src);
-      snd.volume = audioOut.volume;
-      snd.currentTime = 0;
-      snd.play().catch(() => {});
-    } else if (phaseObj.sound === "gong" && audioGong) {
-      const snd = new Audio(audioGong.src);
-      snd.volume = audioGong.volume;
-      snd.currentTime = 0;
-      snd.play().catch(() => {});
+    let aud = null;
+
+    if (phaseObj.sound === "in") aud = audioIn;
+    if (phaseObj.sound === "out") aud = audioOut;
+    if (phaseObj.sound === "gong") aud = audioGong;
+
+    if (aud) {
+      try {
+        aud.pause(); // stop if still playing
+        aud.currentTime = 0; // rewind
+        aud.play().catch(() => {});
+      } catch (err) {
+        console.warn("Audio play failed:", err);
+      }
     }
   }
 
