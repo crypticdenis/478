@@ -97,26 +97,21 @@ document.addEventListener("DOMContentLoaded", () => {
   if (audioIn) audioIn.load();
   if (audioOut) audioOut.load();
 
-  // Play sound helper (reliable DOM element reuse)
-  // Play sound helper (reliable DOM element reuse)
   function playSound(phaseObj) {
-    let aud = null;
-    if (phaseObj.sound === "in") aud = audioIn;
-    if (phaseObj.sound === "out") aud = audioOut;
-    if (phaseObj.sound === "gong") aud = audioGong;
-
-    if (aud) {
-      // Stop any current playback immediately
-      aud.pause();
-      aud.currentTime = 0;
-
-      // Start playback and handle the promise
-      aud.play().catch((err) => {
-        // Catch and ignore the AbortError
-        if (err.name !== "AbortError") {
-          console.warn("Audio play failed:", err);
-        }
-      });
+    if (phaseObj.sound === "in" && audioIn) {
+      // Clone for iOS reliability
+      const clone = audioIn.cloneNode();
+      clone.currentTime = 0;
+      clone.volume = audioIn.volume;
+      clone.play();
+    } else if (phaseObj.sound === "out" && audioOut) {
+      const clone = audioOut.cloneNode();
+      clone.currentTime = 0;
+      clone.volume = audioOut.volume;
+      clone.play();
+    } else if (phaseObj.sound === "gong" && audioGong) {
+      audioGong.currentTime = 0;
+      audioGong.play();
     }
   }
   function breatheLoop() {
