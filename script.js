@@ -119,7 +119,24 @@ document.addEventListener("DOMContentLoaded", () => {
       breatheLoop();
     }, p.duration);
   }
+  // iOS audio unlock workaround
+  let audioUnlocked = false;
+  function unlockAllAudio() {
+    if (audioUnlocked) return;
+    [audioIn, audioOut, audioGong].forEach((aud) => {
+      if (aud) {
+        aud.volume = 0;
+        aud.play().catch(() => {});
+        aud.pause();
+        aud.currentTime = 0;
+        aud.volume = 1;
+      }
+    });
+    audioUnlocked = true;
+  }
+
   circle.addEventListener("click", () => {
+    unlockAllAudio();
     if (!running) {
       running = true;
       phase = 0;
