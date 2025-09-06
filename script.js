@@ -67,12 +67,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Single audio track for the whole cycle
   let cycleAudio = new Audio("sounds/cycle.mp3");
-  cycleAudio.loop = true;
   cycleAudio.volume = 0.6;
 
   let running = false;
   let phase = 0;
   let timeoutId = null;
+  let cycleAudioTimeout = null; // to restart audio every 19s
 
   const phases = [
     {
@@ -133,18 +133,27 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!running) {
       running = true;
       phase = 0;
-      cycleAudio.currentTime = 0;
-      cycleAudio.play().catch(() => {});
+
+      // Play cycle audio and restart every 19 seconds
+      function playCycleAudioLoop() {
+        if (!running) return;
+        cycleAudio.currentTime = 0;
+        cycleAudio.play().catch(() => {});
+        cycleAudioTimeout = setTimeout(playCycleAudioLoop, 19000); // 4+7+8=19s
+      }
+      playCycleAudioLoop();
+
       breathePhaseLoop();
     } else {
       running = false;
       cycleAudio.pause();
       cycleAudio.currentTime = 0;
+      clearTimeout(timeoutId);
+      clearTimeout(cycleAudioTimeout);
       text.textContent = "Click to begin";
       circle.style.transform = "scale(1)";
       circle.style.background = "#8D9DDA";
       circle.style.boxShadow = "0 0 40px 0 rgba(141,157,218,0.2)";
-      clearTimeout(timeoutId);
     }
   });
 });
