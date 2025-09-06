@@ -95,14 +95,20 @@ document.addEventListener("DOMContentLoaded", () => {
   // Play sound helper
   function playSound(phaseObj) {
     if (phaseObj.sound === "in" && audioIn) {
-      audioIn.currentTime = 0;
-      audioIn.play().catch(() => {});
+      const snd = new Audio(audioIn.src);
+      snd.volume = audioIn.volume;
+      snd.currentTime = 0;
+      snd.play().catch(() => {});
     } else if (phaseObj.sound === "out" && audioOut) {
-      audioOut.currentTime = 0;
-      audioOut.play().catch(() => {});
+      const snd = new Audio(audioOut.src);
+      snd.volume = audioOut.volume;
+      snd.currentTime = 0;
+      snd.play().catch(() => {});
     } else if (phaseObj.sound === "gong" && audioGong) {
-      audioGong.currentTime = 0;
-      audioGong.play().catch(() => {});
+      const snd = new Audio(audioGong.src);
+      snd.volume = audioGong.volume;
+      snd.currentTime = 0;
+      snd.play().catch(() => {});
     }
   }
 
