@@ -100,17 +100,33 @@ document.addEventListener("DOMContentLoaded", () => {
       audioCycle.play();
     }
   }
-  function breatheLoop() {
+
+  // This function now handles both the visual update and the timing for each phase
+  function breathePhaseLoop() {
     if (!running) return;
-    // Play and schedule the cycle sound every 19 seconds
-    playCycleSound();
-    timeoutId = setTimeout(() => {
-      breatheLoop();
-    }, 19000);
+
+    // Get current phase data and update UI
+    const currentPhase = phases[phase];
+    text.textContent = currentPhase.label;
+    circle.style.transform = `scale(${currentPhase.scale})`;
+    circle.style.background = currentPhase.color;
+    circle.style.boxShadow = currentPhase.shadow;
+
+    // Play the sound for the start of the cycle (e.g., a bell or gong)
+    if (phase === 0) {
+      playCycleSound();
+    }
+
+    // Move to the next phase, cycling back to the beginning
+    phase = (phase + 1) % phases.length;
+
+    // Schedule the next phase update
+    timeoutId = setTimeout(breathePhaseLoop, currentPhase.duration);
   }
 
   // iOS audio unlock workaround
   let audioUnlocked = false;
+
   function unlockAllAudio() {
     if (audioUnlocked) return;
     if (audioCycle) {
@@ -132,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!running) {
       running = true;
       phase = 0;
-      breatheLoop();
+      breathePhaseLoop(); // Start the animation loop
     } else {
       running = false;
       text.textContent = "Click to begin";
