@@ -72,7 +72,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let running = false;
   let phase = 0;
   let timeoutId = null;
-  let cycleAudioTimeout = null; // to restart audio every 19s
 
   const phases = [
     {
@@ -134,14 +133,12 @@ document.addEventListener("DOMContentLoaded", () => {
       running = true;
       phase = 0;
 
-      // Play cycle audio and restart every 19 seconds
-      function playCycleAudioLoop() {
-        if (!running) return;
-        cycleAudio.currentTime = 0;
-        cycleAudio.play().catch(() => {});
-        cycleAudioTimeout = setTimeout(playCycleAudioLoop, 19000); // 4+7+8=19s
-      }
-      playCycleAudioLoop();
+      // Play audio once, loop handled natively
+      cycleAudio.currentTime = 0;
+      cycleAudio.loop = true;
+      cycleAudio.play().catch((err) => {
+        console.log("Audio failed to play:", err);
+      });
 
       breathePhaseLoop();
     } else {
@@ -149,7 +146,6 @@ document.addEventListener("DOMContentLoaded", () => {
       cycleAudio.pause();
       cycleAudio.currentTime = 0;
       clearTimeout(timeoutId);
-      clearTimeout(cycleAudioTimeout);
       text.textContent = "Click to begin";
       circle.style.transform = "scale(1)";
       circle.style.background = "#8D9DDA";
