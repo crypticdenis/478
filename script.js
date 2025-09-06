@@ -107,13 +107,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (aud) {
       try {
-        aud.pause();
+        if (!aud.paused) {
+          try {
+            aud.pause();
+          } catch (e) {}
+        }
         aud.currentTime = 0;
         aud.play().catch((err) => {
-          console.warn("Audio play failed:", err);
+          if (!(err && err.name === "AbortError")) {
+            console.warn("Audio play failed:", err);
+          }
         });
       } catch (err) {
-        console.warn("Audio exception:", err);
+        if (!(err && err.name === "AbortError")) {
+          console.warn("Audio exception:", err);
+        }
       }
     }
   }
