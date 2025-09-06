@@ -91,23 +91,21 @@ document.addEventListener("DOMContentLoaded", () => {
       sound: "out",
     },
   ];
+
+  // Play sound helper
   function playSound(phaseObj) {
     if (phaseObj.sound === "in" && audioIn) {
-      // Clone for iOS reliability
-      const clone = audioIn.cloneNode();
-      clone.currentTime = 0;
-      clone.volume = audioIn.volume;
-      clone.play();
+      audioIn.currentTime = 0;
+      audioIn.play().catch(() => {});
     } else if (phaseObj.sound === "out" && audioOut) {
-      const clone = audioOut.cloneNode();
-      clone.currentTime = 0;
-      clone.volume = audioOut.volume;
-      clone.play();
+      audioOut.currentTime = 0;
+      audioOut.play().catch(() => {});
     } else if (phaseObj.sound === "gong" && audioGong) {
       audioGong.currentTime = 0;
-      audioGong.play();
+      audioGong.play().catch(() => {});
     }
   }
+
   function breatheLoop() {
     if (!running) return;
     const p = phases[phase];
@@ -124,6 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
       breatheLoop();
     }, p.duration);
   }
+
   // iOS audio unlock workaround
   let audioUnlocked = false;
   function unlockAllAudio() {
