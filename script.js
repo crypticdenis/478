@@ -93,6 +93,9 @@ document.addEventListener("DOMContentLoaded", () => {
       sound: "out",
     },
   ];
+  // Preload audio for iOS reliability
+  if (audioIn) audioIn.load();
+  if (audioOut) audioOut.load();
 
   // Play sound helper (reliable DOM element reuse)
   function playSound(phaseObj) {
@@ -104,8 +107,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (aud) {
       try {
-        aud.pause(); // stop if still playing
-        aud.currentTime = 0; // rewind
+        aud.pause();
+        aud.currentTime = 0;
         aud.play().catch((err) => {
           console.warn("Audio play failed:", err);
         });
