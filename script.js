@@ -10,14 +10,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const burgerMenu = document.getElementById("burgerMenu");
   const sidebarMenu = document.getElementById("sidebarMenu");
   const closeSidebar = document.getElementById("closeSidebar");
+
   burgerMenu.addEventListener("click", () => {
     sidebarMenu.classList.add("open");
     sidebarMenu.focus();
   });
+
   closeSidebar.addEventListener("click", () => {
     sidebarMenu.classList.remove("open");
     burgerMenu.focus();
   });
+
   // Close sidebar with Escape key
   sidebarMenu.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
@@ -34,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
     river: "sounds/river.mp3",
     white_noise: "sounds/white_noise.mp3",
   };
+
   function stopBgAudio() {
     if (bgAudio) {
       bgAudio.pause();
@@ -41,6 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
       bgAudio = null;
     }
   }
+
   bgSoundBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
       bgSoundBtns.forEach((b) => b.classList.remove("active"));
@@ -59,7 +64,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // Breathing logic
   const circle = document.getElementById("breathe478Circle");
   const text = document.getElementById("breathe478Text");
-  const audioCycle = document.getElementById("audioCycle");
+
+  // Single audio track for the whole cycle
+  let cycleAudio = new Audio("sounds/cycle.mp3");
+  cycleAudio.loop = true;
+  cycleAudio.volume = 0.6;
 
   let running = false;
   let phase = 0;
@@ -72,7 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
       scale: 1.3,
       color: "#8D9DDA",
       shadow: "0 0 80px 20px #8D9DDA88",
-      sound: "in",
     },
     {
       label: "Hold",
@@ -80,7 +88,6 @@ document.addEventListener("DOMContentLoaded", () => {
       scale: 1.3,
       color: "#C1C9E5",
       shadow: "0 0 100px 30px #C1C9E588",
-      sound: "gong",
     },
     {
       label: "Exhale",
@@ -88,69 +95,51 @@ document.addEventListener("DOMContentLoaded", () => {
       scale: 0.7,
       color: "#283246",
       shadow: "0 0 60px 0 #28324688",
-      sound: "out",
     },
   ];
-  // Preload audio for iOS reliability
-  if (audioCycle) audioCycle.load();
 
-  function playCycleSound() {
-    if (audioCycle) {
-      audioCycle.currentTime = 0;
-      audioCycle.play();
-    }
-  }
-
-  // This function now handles both the visual update and the timing for each phase
   function breathePhaseLoop() {
     if (!running) return;
 
-    // Get current phase data and update UI
     const currentPhase = phases[phase];
     text.textContent = currentPhase.label;
     circle.style.transform = `scale(${currentPhase.scale})`;
     circle.style.background = currentPhase.color;
     circle.style.boxShadow = currentPhase.shadow;
 
-    // Play the sound for the start of the cycle (e.g., a bell or gong)
-    if (phase === 0) {
-      playCycleSound();
-    }
-
-    // Move to the next phase, cycling back to the beginning
     phase = (phase + 1) % phases.length;
-
-    // Schedule the next phase update
     timeoutId = setTimeout(breathePhaseLoop, currentPhase.duration);
   }
 
   // iOS audio unlock workaround
   let audioUnlocked = false;
-
   function unlockAllAudio() {
     if (audioUnlocked) return;
-    if (audioCycle) {
-      audioCycle.muted = true;
-      audioCycle
-        .play()
-        .then(() => {
-          audioCycle.pause();
-          audioCycle.currentTime = 0;
-          audioCycle.muted = false;
-        })
-        .catch(() => {});
-    }
+    cycleAudio.muted = true;
+    cycleAudio
+      .play()
+      .then(() => {
+        cycleAudio.pause();
+        cycleAudio.currentTime = 0;
+        cycleAudio.muted = false;
+      })
+      .catch(() => {});
     audioUnlocked = true;
   }
 
+  // Start/stop breathing on circle click
   circle.addEventListener("click", () => {
     unlockAllAudio();
     if (!running) {
       running = true;
       phase = 0;
-      breathePhaseLoop(); // Start the animation loop
+      cycleAudio.currentTime = 0;
+      cycleAudio.play().catch(() => {});
+      breathePhaseLoop();
     } else {
       running = false;
+      cycleAudio.pause();
+      cycleAudio.currentTime = 0;
       text.textContent = "Click to begin";
       circle.style.transform = "scale(1)";
       circle.style.background = "#8D9DDA";
