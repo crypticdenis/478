@@ -59,9 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Breathing logic
   const circle = document.getElementById("breathe478Circle");
   const text = document.getElementById("breathe478Text");
-  const audioIn = document.getElementById("audioIn");
-  const audioOut = document.getElementById("audioOut");
-  const audioGong = document.getElementById("audioGong");
+  const audioCycle = document.getElementById("audioCycle");
 
   let running = false;
   let phase = 0;
@@ -94,60 +92,38 @@ document.addEventListener("DOMContentLoaded", () => {
     },
   ];
   // Preload audio for iOS reliability
-  if (audioIn) audioIn.load();
-  if (audioOut) audioOut.load();
+  if (audioCycle) audioCycle.load();
 
-  function playSound(phaseObj) {
-    if (phaseObj.sound === "in" && audioIn) {
-      // Clone for iOS reliability
-      const clone = audioIn.cloneNode();
-      clone.currentTime = 0;
-      clone.volume = audioIn.volume;
-      clone.play();
-    } else if (phaseObj.sound === "out" && audioOut) {
-      const clone = audioOut.cloneNode();
-      clone.currentTime = 0;
-      clone.volume = audioOut.volume;
-      clone.play();
-    } else if (phaseObj.sound === "gong" && audioGong) {
-      audioGong.currentTime = 0;
-      audioGong.play();
+  function playCycleSound() {
+    if (audioCycle) {
+      audioCycle.currentTime = 0;
+      audioCycle.play();
     }
   }
   function breatheLoop() {
     if (!running) return;
-    const p = phases[phase];
-    text.textContent = p.label;
-    circle.style.transition = `transform ${
-      p.duration / 1000
-    }s cubic-bezier(0.4,0,0.2,1), background 1s, box-shadow 1.5s`;
-    circle.style.transform = `scale(${p.scale})`;
-    circle.style.background = p.color;
-    circle.style.boxShadow = p.shadow;
-    playSound(p);
+    // Play and schedule the cycle sound every 19 seconds
+    playCycleSound();
     timeoutId = setTimeout(() => {
-      phase = (phase + 1) % phases.length;
       breatheLoop();
-    }, p.duration);
+    }, 19000);
   }
 
   // iOS audio unlock workaround
   let audioUnlocked = false;
   function unlockAllAudio() {
     if (audioUnlocked) return;
-    [audioIn, audioOut, audioGong].forEach((aud) => {
-      if (aud) {
-        aud.muted = true;
-        aud
-          .play()
-          .then(() => {
-            aud.pause();
-            aud.currentTime = 0;
-            aud.muted = false;
-          })
-          .catch(() => {});
-      }
-    });
+    if (audioCycle) {
+      audioCycle.muted = true;
+      audioCycle
+        .play()
+        .then(() => {
+          audioCycle.pause();
+          audioCycle.currentTime = 0;
+          audioCycle.muted = false;
+        })
+        .catch(() => {});
+    }
     audioUnlocked = true;
   }
 
