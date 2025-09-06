@@ -1,5 +1,13 @@
-// 4-7-8 Breathing Animation (inhale-hold-exhale)
+// 4-7-8 Breathing Animation (inhale-hold-exhale) with iOS audio fixes
 document.addEventListener("DOMContentLoaded", () => {
+  // Detect iOS
+  const isIOS =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+  if (isIOS) {
+    document.getElementById("iosAudioNotice").classList.add("visible");
+  }
+
   // Ripple effect on load
   document.body.classList.add("pulsate");
   setTimeout(() => {
@@ -51,7 +59,24 @@ document.addEventListener("DOMContentLoaded", () => {
         bgAudio = new Audio(bgSounds[sound]);
         bgAudio.loop = true;
         bgAudio.volume = 0.5;
-        bgAudio.play();
+
+        // iOS-specific audio handling
+        if (isIOS) {
+          // Ensure audio plays even if silent switch is on
+          bgAudio.addEventListener("play", () => {
+            if (
+              typeof bgAudio.webkitAudioContext !== "undefined" ||
+              typeof bgAudio.audioContext !== "undefined"
+            ) {
+              // This helps with iOS audio restrictions
+              bgAudio.volume = 1.0;
+            }
+          });
+        }
+
+        bgAudio.play().catch((e) => {
+          console.log("Background audio play failed:", e);
+        });
       }
     });
   });
@@ -93,27 +118,63 @@ document.addEventListener("DOMContentLoaded", () => {
       sound: "out",
     },
   ];
+
   // Preload audio for iOS reliability
-  if (audioIn) audioIn.load();
-  if (audioOut) audioOut.load();
+  if (audioIn) {
+    audioIn.preload = "auto";
+    audioIn.load();
+  }
+  if (audioOut) {
+    audioOut.preload = "auto";
+    audioOut.load();
+  }
+  if (audioGong) {
+    audioGong.preload = "auto";
+    audioGong.load();
+  }
 
   function playSound(phaseObj) {
     if (phaseObj.sound === "in" && audioIn) {
-      // Clone for iOS reliability
-      const clone = audioIn.cloneNode();
-      clone.currentTime = 0;
-      clone.volume = audioIn.volume;
-      clone.play();
+      // iOS-specific handling for inhale sound
+      if (isIOS) {
+        // Create a new audio instance each time for iOS
+        const newAudio = new Audio();
+        newAudio.src = audioIn.src;
+        newAudio.volume = audioIn.volume;
+        newAudio.play().catch((e) => {
+          console.log("iOS inhale audio play failed:", e);
+        });
+      } else {
+        // Standard approach for other devices
+        audioIn.currentTime = 0;
+        audioIn.play().catch((e) => {
+          console.log("Inhale audio play failed:", e);
+        });
+      }
     } else if (phaseObj.sound === "out" && audioOut) {
-      const clone = audioOut.cloneNode();
-      clone.currentTime = 0;
-      clone.volume = audioOut.volume;
-      clone.play();
+      // iOS-specific handling for exhale sound
+      if (isIOS) {
+        const newAudio = new Audio();
+        newAudio.src = audioOut.src;
+        newAudio.volume = audioOut.volume;
+        newAudio.play().catch((e) => {
+          console.log("iOS exhale audio play failed:", e);
+        });
+      } else {
+        audioOut.currentTime = 0;
+        audioOut.play().catch((e) => {
+          console.log("Exhale audio play failed:", e);
+        });
+      }
     } else if (phaseObj.sound === "gong" && audioGong) {
+      // Gong sound typically works on iOS
       audioGong.currentTime = 0;
-      audioGong.play();
+      audioGong.play().catch((e) => {
+        console.log("Gong audio play failed:", e);
+      });
     }
   }
+
   function breatheLoop() {
     if (!running) return;
     const p = phases[phase];
@@ -135,17 +196,22 @@ document.addEventListener("DOMContentLoaded", () => {
   let audioUnlocked = false;
   function unlockAllAudio() {
     if (audioUnlocked) return;
+
+    // For iOS, we need to play and immediately pause audio elements
+    // to "unlock" them for future playback
     [audioIn, audioOut, audioGong].forEach((aud) => {
       if (aud) {
-        aud.muted = true;
+        aud.volume = 0; // Mute during unlock
         aud
           .play()
           .then(() => {
             aud.pause();
             aud.currentTime = 0;
-            aud.muted = false;
+            aud.volume = 1; // Restore volume
           })
-          .catch(() => {});
+          .catch((e) => {
+            console.log("Audio unlock failed:", e);
+          });
       }
     });
     audioUnlocked = true;
