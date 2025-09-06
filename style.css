@@ -207,8 +207,8 @@ h1 {
   pointer-events: none;
 }
 .breathe-478-circle {
-  width: clamp(90px, 60vw, 220px);
-  height: clamp(90px, 60vw, 220px);
+  width: 25vw;
+  height: 25vw;
   background: linear-gradient(135deg, #8d9dda 60%, #c1c9e5 100%);
   border-radius: 50%;
   box-shadow: 0 0 80px 10px #8d9dda55, 0 0 0 8px #fff2;
@@ -272,8 +272,8 @@ h1 {
     justify-content: center;
   }
   .breathe-478-circle {
-    width: clamp(300px, 70vw, 140px);
-    height: clamp(300px, 70vw, 140px);
+    width: 70vw;
+    height: 70vw;
     margin-bottom: 14px;
     touch-action: manipulation;
   }
@@ -304,8 +304,8 @@ h1 {
 }
 @media (max-width: 400px) {
   .breathe-478-circle {
-    width: clamp(60px, 85vw, 100px);
-    height: clamp(60px, 85vw, 100px);
+    width: 65vw;
+    height: 65vw;
   }
   .breathe-478-circle svg circle {
     stroke-width: 0.7;
