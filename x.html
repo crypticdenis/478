@@ -245,7 +245,13 @@
       </div>
       <div class="countdown" id="prank-countdown">5</div>
       <div>Sekunden...</div>
-      <div class="small">(Nur Spaß! Gleich geht's weiter...)</div>
+      <div
+        class="small"
+        id="prank-spass"
+        style="opacity: 0; transition: opacity 0.5s"
+      >
+        (Nur Spaß! Gleich geht's weiter...)
+      </div>
     </div>
     <main style="display: none">
       <h3>
@@ -277,6 +283,7 @@
       const main = document.querySelector("main");
       const prank = document.getElementById("prank-overlay");
       const prankCountdown = document.getElementById("prank-countdown");
+      const prankSpass = document.getElementById("prank-spass");
 
       form.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -284,12 +291,16 @@
           // Start prank
           gate.style.display = "none";
           prank.style.display = "flex";
+          prankSpass.style.opacity = 0;
           let count = 5;
           prankCountdown.textContent = count;
           const interval = setInterval(() => {
             count--;
             prankCountdown.textContent = count;
-            if (count <= 0) {
+            if (count === 0) {
+              prankSpass.style.opacity = 1;
+            }
+            if (count < 0) {
               clearInterval(interval);
               prank.style.display = "none";
               main.style.display = "";
