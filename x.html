@@ -101,6 +101,60 @@
         background: #fff;
         padding: 8px;
       }
+      #code-gate {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(0, 0, 0, 0.92);
+        backdrop-filter: blur(2px);
+      }
+      #code-gate label {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        color: #fff;
+        letter-spacing: 0.5px;
+      }
+      #code-gate input[type="password"] {
+        padding: 0.7em 1em;
+        font-size: 1.1rem;
+        border-radius: 6px;
+        border: 1.5px solid #8d9dda;
+        outline: none;
+        margin-bottom: 1.2rem;
+        background: #181a22;
+        color: #fff;
+        transition: border 0.2s;
+      }
+      #code-gate input[type="password"]:focus {
+        border: 1.5px solid #fff;
+      }
+      #code-gate button {
+        padding: 0.7em 1.5em;
+        font-size: 1.1rem;
+        border-radius: 6px;
+        border: none;
+        background: #8d9dda;
+        color: #232323;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+      }
+      #code-gate button:hover,
+      #code-gate button:focus {
+        background: #fff;
+        color: #232323;
+      }
+      #code-gate .error {
+        color: #ff6b6b;
+        margin-top: 0.7rem;
+        font-size: 1rem;
+        min-height: 1.2em;
+      }
       @media (max-width: 700px) {
         main {
           max-width: 98vw;
@@ -117,11 +171,22 @@
         .qr-section img {
           max-width: 180px;
         }
+        #code-gate {
+          padding: 2rem 0.5rem;
+        }
       }
     </style>
   </head>
   <body>
-    <main>
+    <div id="code-gate">
+      <form id="code-form" autocomplete="off">
+        <label for="secret-code">Bitte Code eingeben, um fortzufahren:</label>
+        <input type="password" id="secret-code" autocomplete="off" required />
+        <button type="submit">Weiter</button>
+        <div class="error" id="code-error"></div>
+      </form>
+    </div>
+    <main style="display: none">
       <h3>
         Alles Gute zum Geburtstag!<br />
         Hier kannst du dein Geschenk herunterladen oder direkt aufs Handy
@@ -140,5 +205,32 @@
         </div>
       </div>
     </main>
+    <script>
+      // Change this to your desired code!
+      const SECRET_CODE = "geburtstag2025";
+
+      const gate = document.getElementById("code-gate");
+      const form = document.getElementById("code-form");
+      const input = document.getElementById("secret-code");
+      const error = document.getElementById("code-error");
+      const main = document.querySelector("main");
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (input.value.trim() === SECRET_CODE) {
+          gate.style.display = "none";
+          main.style.display = "";
+        } else {
+          error.textContent = "Falscher Code. Bitte erneut versuchen.";
+          input.value = "";
+          input.focus();
+        }
+      });
+
+      // Optional: focus input on load
+      window.addEventListener("DOMContentLoaded", () => {
+        input.focus();
+      });
+    </script>
   </body>
 </html>
