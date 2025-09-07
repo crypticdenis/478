@@ -23,14 +23,41 @@
       main {
         flex: 1;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
+      }
+      img {
+        max-width: 80vw;
+        height: auto;
+        margin-bottom: 1.5rem;
+      }
+      .download-link {
+        display: inline-block;
+        margin-top: 0.5rem;
+        padding: 0.7em 1.2em;
+        background: #232323;
+        color: #fff;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 1.1rem;
+        border: 1px solid #444;
+        transition: background 0.2s, color 0.2s;
+      }
+      .download-link:hover,
+      .download-link:focus {
+        background: #fff;
+        color: #000;
       }
     </style>
   </head>
   <body>
     <main>
-      <img src="img/code.png" alt="" />
+      <p>Code mit Handy scannen um direkt dort zu speichern</p>
+      <img src="img/code.png" alt="QR Code" />
+      <a class="download-link" href="img/gutschein.pdf" download>
+        📄 Datei herunterladen
+      </a>
       <!-- Content goes here -->
     </main>
   </body>
