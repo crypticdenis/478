@@ -155,6 +155,52 @@
         font-size: 1rem;
         min-height: 1.2em;
       }
+      #prank-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        background: #000;
+        color: #ff4444;
+        font-family: "Courier New", Courier, monospace;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+        font-size: 2rem;
+        animation: shake 0.6s infinite alternate;
+      }
+      #prank-overlay .countdown {
+        font-size: 3.5rem;
+        margin: 1.2rem 0 0.5rem 0;
+        color: #fff;
+        letter-spacing: 0.1em;
+        font-weight: bold;
+        text-shadow: 0 0 18px #ff4444, 0 0 2px #fff;
+      }
+      #prank-overlay .small {
+        font-size: 1.1rem;
+        color: #aaa;
+        margin-top: 1.5rem;
+        text-shadow: none;
+      }
+      @keyframes shake {
+        0% {
+          transform: translate(0, 0);
+        }
+        25% {
+          transform: translate(-5px, 2px);
+        }
+        50% {
+          transform: translate(4px, -3px);
+        }
+        75% {
+          transform: translate(-3px, 4px);
+        }
+        100% {
+          transform: translate(2px, -2px);
+        }
+      }
       @media (max-width: 700px) {
         main {
           max-width: 98vw;
@@ -174,6 +220,12 @@
         #code-gate {
           padding: 2rem 0.5rem;
         }
+        #prank-overlay {
+          font-size: 1.2rem;
+        }
+        #prank-overlay .countdown {
+          font-size: 2.2rem;
+        }
       }
     </style>
   </head>
@@ -185,6 +237,15 @@
         <button type="submit">Weiter</button>
         <div class="error" id="code-error"></div>
       </form>
+    </div>
+    <div id="prank-overlay">
+      <div>
+        ⚠️ <b>Warnung!</b> <br />
+        Dein Gerät zerstört sich in
+      </div>
+      <div class="countdown" id="prank-countdown">5</div>
+      <div>Sekunden...</div>
+      <div class="small">(Nur Spaß! Gleich geht's weiter...)</div>
     </div>
     <main style="display: none">
       <h3>
@@ -214,12 +275,26 @@
       const input = document.getElementById("secret-code");
       const error = document.getElementById("code-error");
       const main = document.querySelector("main");
+      const prank = document.getElementById("prank-overlay");
+      const prankCountdown = document.getElementById("prank-countdown");
 
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         if (input.value.trim() === SECRET_CODE) {
+          // Start prank
           gate.style.display = "none";
-          main.style.display = "";
+          prank.style.display = "flex";
+          let count = 5;
+          prankCountdown.textContent = count;
+          const interval = setInterval(() => {
+            count--;
+            prankCountdown.textContent = count;
+            if (count <= 0) {
+              clearInterval(interval);
+              prank.style.display = "none";
+              main.style.display = "";
+            }
+          }, 1000);
         } else {
           error.textContent = "Falscher Code. Bitte erneut versuchen.";
           input.value = "";
