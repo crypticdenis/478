@@ -25,7 +25,7 @@
       main {
         flex: 1;
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
       }
@@ -51,6 +51,10 @@
         background: #fff;
         color: #000;
       }
+      div {
+        display: flex;
+        flex-direction: row;
+      }
     </style>
   </head>
   <body>
@@ -59,12 +63,16 @@
         Alles Gute zum Geburtstag: Auf dieser Seite kannst du dein Geschenk
         downloaden
       </h3>
-      <a class="download-link" href="img/gutschein.pdf" download>
-        📄 Datei herunterladen
-      </a>
-      <h3>ODER:</h3>
-      <p>Code mit Handy scannen um direkt dort zu speichern</p>
-      <img src="img/code.png" alt="QR Code" />
+      <div>
+        <a class="download-link" href="img/gutschein.pdf" download>
+          📄 Datei herunterladen
+        </a>
+      </div>
+      <div>
+        <h3>ODER:</h3>
+        <p>Code mit Handy scannen um direkt dort zu speichern</p>
+        <img src="img/code.png" alt="QR Code" />
+      </div>
       <!-- Content goes here -->
     </main>
   </body>
