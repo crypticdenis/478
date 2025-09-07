@@ -179,14 +179,6 @@
         font-weight: bold;
         text-shadow: 0 0 18px #ff4444, 0 0 2px #fff;
       }
-      #prank-overlay .small {
-        font-size: 1.1rem;
-        color: #aaa;
-        margin-top: 1.5rem;
-        text-shadow: none;
-        opacity: 0;
-        transition: opacity 0.5s;
-      }
       @keyframes shake {
         0% {
           transform: translate(0, 0);
@@ -202,6 +194,69 @@
         }
         100% {
           transform: translate(2px, -2px);
+        }
+      }
+      /* Konfetti */
+      .confetti {
+        pointer-events: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 20000;
+        overflow: hidden;
+      }
+      /* Spaß-Overlay */
+      #spass-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 15000;
+        background: rgba(0, 0, 0, 0.93);
+        color: #8d9dda;
+        font-family: Arial, sans-serif;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+        font-size: 2rem;
+        padding: 0 1.5rem;
+        animation: fadeIn 0.7s;
+      }
+      #spass-overlay h2 {
+        margin: 0 0 1.2rem 0;
+        font-size: 2.2rem;
+        color: #fff;
+        text-shadow: 0 2px 12px #8d9dda;
+      }
+      #spass-overlay p {
+        font-size: 1.2rem;
+        color: #8d9dda;
+        margin-bottom: 2.5rem;
+      }
+      #spass-overlay button {
+        padding: 0.7em 1.5em;
+        font-size: 1.1rem;
+        border-radius: 6px;
+        border: none;
+        background: #8d9dda;
+        color: #232323;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+      }
+      #spass-overlay button:hover,
+      #spass-overlay button:focus {
+        background: #fff;
+        color: #232323;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
         }
       }
       @media (max-width: 700px) {
@@ -223,25 +278,15 @@
         #code-gate {
           padding: 2rem 0.5rem;
         }
-        #prank-overlay {
+        #prank-overlay,
+        #spass-overlay {
           font-size: 1.2rem;
         }
         #prank-overlay .countdown {
           font-size: 2.2rem;
         }
-      }
-      /* Spaß-Hinweis auf dem Downloadscreen */
-      .spass-hinweis {
-        margin-top: 2.5rem;
-        color: #8d9dda;
-        font-size: 1.15rem;
-        text-align: center;
-        opacity: 0;
-        animation: fadeIn 1.2s 0.5s forwards;
-      }
-      @keyframes fadeIn {
-        to {
-          opacity: 1;
+        #spass-overlay h2 {
+          font-size: 1.3rem;
         }
       }
     </style>
@@ -262,9 +307,15 @@
       </div>
       <div class="countdown" id="prank-countdown">5</div>
       <div>Sekunden...</div>
-      <div class="small" id="prank-spass">
-        (Nur Spaß! Gleich geht's weiter...)
-      </div>
+    </div>
+    <div class="confetti" id="confetti-canvas"></div>
+    <div id="spass-overlay">
+      <h2>Nur Spaß! 😁</h2>
+      <p>
+        Keine Sorge, dein Gerät ist sicher.<br />Alles Gute zum Geburtstag und
+        viel Spaß mit deinem Geschenk! 🎉
+      </p>
+      <button id="spass-btn">Weiter zum Geschenk</button>
     </div>
     <main style="display: none">
       <h3>
@@ -284,10 +335,6 @@
           <img src="img/code.png" alt="QR Code" />
         </div>
       </div>
-      <div class="spass-hinweis" id="spass-hinweis" style="display: none">
-        Keine Sorge, das war natürlich nur ein Scherz!<br />
-        Viel Spaß mit deinem Geschenk 🎉
-      </div>
     </main>
     <script>
       // Change this to your desired code!
@@ -300,8 +347,9 @@
       const main = document.querySelector("main");
       const prank = document.getElementById("prank-overlay");
       const prankCountdown = document.getElementById("prank-countdown");
-      const prankSpass = document.getElementById("prank-spass");
-      const spassHinweis = document.getElementById("spass-hinweis");
+      const spassOverlay = document.getElementById("spass-overlay");
+      const spassBtn = document.getElementById("spass-btn");
+      const confettiCanvas = document.getElementById("confetti-canvas");
 
       form.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -309,21 +357,17 @@
           // Start prank
           gate.style.display = "none";
           prank.style.display = "flex";
-          prankSpass.style.opacity = 0;
           let count = 5;
           prankCountdown.textContent = count;
           const interval = setInterval(() => {
             count--;
             prankCountdown.textContent = count;
-            if (count === 0) {
-              prankSpass.style.opacity = 1;
-            }
             if (count < 0) {
               clearInterval(interval);
               prank.style.display = "none";
-              main.style.display = "";
-              // Spaß-Hinweis anzeigen
-              spassHinweis.style.display = "block";
+              // Show confetti and spaß overlay
+              startConfetti();
+              spassOverlay.style.display = "flex";
             }
           }, 1000);
         } else {
@@ -337,6 +381,66 @@
       window.addEventListener("DOMContentLoaded", () => {
         input.focus();
       });
+
+      spassBtn.addEventListener("click", () => {
+        spassOverlay.style.display = "none";
+        stopConfetti();
+        main.style.display = "";
+      });
+
+      // Simple confetti effect
+      let confettiInterval;
+      function startConfetti() {
+        confettiCanvas.innerHTML = "";
+        confettiCanvas.style.display = "block";
+        const colors = [
+          "#8d9dda",
+          "#fff",
+          "#ffb347",
+          "#ff6961",
+          "#77dd77",
+          "#fdfd96",
+        ];
+        let confettiPieces = [];
+        for (let i = 0; i < 80; i++) {
+          let div = document.createElement("div");
+          div.style.position = "absolute";
+          div.style.width = "12px";
+          div.style.height = "18px";
+          div.style.background =
+            colors[Math.floor(Math.random() * colors.length)];
+          div.style.left = Math.random() * 100 + "vw";
+          div.style.top = Math.random() * -30 + "vh";
+          div.style.opacity = Math.random() * 0.7 + 0.3;
+          div.style.transform = `rotate(${Math.random() * 360}deg)`;
+          div.style.borderRadius = "3px";
+          confettiCanvas.appendChild(div);
+          confettiPieces.push({
+            el: div,
+            x: parseFloat(div.style.left),
+            y: parseFloat(div.style.top),
+            r: Math.random() * 2 + 1,
+            s: Math.random() * 1.5 + 0.5,
+          });
+        }
+        confettiInterval = setInterval(() => {
+          confettiPieces.forEach((piece) => {
+            piece.y += piece.r;
+            piece.x += Math.sin(piece.y / 30) * piece.s;
+            if (piece.y > 100) {
+              piece.y = Math.random() * -10;
+              piece.x = Math.random() * 100;
+            }
+            piece.el.style.top = piece.y + "vh";
+            piece.el.style.left = piece.x + "vw";
+          });
+        }, 16);
+      }
+      function stopConfetti() {
+        confettiCanvas.style.display = "none";
+        confettiCanvas.innerHTML = "";
+        clearInterval(confettiInterval);
+      }
     </script>
   </body>
 </html>
